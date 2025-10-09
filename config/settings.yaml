@@ -1,0 +1,28 @@
+yfinance:
+  tickers:
+    - COP=X     # USD/COP
+    - BZ=F      # Brent
+    - ^VIX      # VIX
+    - ^DXY      # DXY confirmado
+  period_years: 5
+  interval: 1d
+investiny:
+  enabled: false
+  instruments:
+    col_bond_5y: null
+    col_bond_10y: null
+news:
+  enabled: true
+  keywords: ["peso", "dólar", "dolar", "USDCOP", "TRM", "Brent", "petróleo", "petroleo", "tasa", "inflación", "inflacion", "TES"]
+  sources_csv: info_sources.csv
+llm:
+  enabled: false
+  provider: null
+  model: null
+storage:
+  base_dir: data
+reports:
+  dir: reports/briefings
+locale:
+  language: es
+  timezone: America/Bogota
