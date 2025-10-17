@@ -3,14 +3,20 @@ yfinance:
     - COP=X     # USD/COP
     - BZ=F      # Brent
     - ^VIX      # VIX
-    - ^DXY      # DXY confirmado
+    - DX-Y.NYB  # DXY (ICE)
   period_years: 5
   interval: 1d
 investiny:
-  enabled: false
+  enabled: true
+  interval: D
+  lookback_days: 365
   instruments:
-    col_bond_5y: null
-    col_bond_10y: null
+    col_bond_5y:
+      id: 29240
+      alias: COL_BOND_5Y
+    col_bond_10y:
+      id: 29236
+      alias: COL_BOND_10Y
 news:
   enabled: true
   keywords: ["peso", "dólar", "dolar", "USDCOP", "TRM", "Brent", "petróleo", "petroleo", "tasa", "inflación", "inflacion", "TES"]

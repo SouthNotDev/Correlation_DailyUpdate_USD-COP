@@ -20,11 +20,16 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from src.data.prices_yf import download_yf_prices, save_prices_csv_per_symbol, to_long
-from src.data.combine import add_basic_features
-from src.news.scrape import scrape_sources
 from src.analysis.features import daily_context
-from src.llm.summarize import build_briefing_markdown, build_briefing_html
+from src.data.combine import add_basic_features
+from src.data.prices_investiny import (
+    download_investiny_prices,
+    investiny_to_long,
+    save_investiny_csv_per_instrument,
+)
+from src.data.prices_yf import download_yf_prices, save_prices_csv_per_symbol, to_long
+from src.llm.summarize import build_briefing_html, build_briefing_markdown
+from src.news.scrape import scrape_sources
 from src.utils.io import ensure_dir
 
 
@@ -61,14 +66,40 @@ def main() -> None:
     interval = settings["yfinance"].get("interval", "1d")
 
     prices_wide = download_yf_prices(tickers, period_years=period_years, interval=interval)
+    long_frames: list[pd.DataFrame] = []
     if not prices_wide.empty:
         save_prices_csv_per_symbol(prices_wide, base_dir=base_dir, date_str=date)
-        long = to_long(prices_wide)
-        long = add_basic_features(long)
-        ensure_dir(Path(base_dir) / "processed")
-        long.to_parquet(Path(base_dir) / "processed" / "market_daily.parquet", index=False)
+        yf_long = to_long(prices_wide)
+        yf_long = add_basic_features(yf_long)
+        long_frames.append(yf_long)
+
+    # 1.b) Precios via Investing.com (investiny)
+    invest_cfg = settings.get("investiny", {})
+    investiny_frames = {}
+    if invest_cfg.get("enabled", False):
+        instruments = invest_cfg.get("instruments", {})
+        lookback_days = int(invest_cfg.get("lookback_days", 365))
+        invest_interval = invest_cfg.get("interval", "D")
+        investiny_frames = download_investiny_prices(
+            instruments,
+            lookback_days=lookback_days,
+            interval=invest_interval,
+        )
+        if investiny_frames:
+            save_investiny_csv_per_instrument(investiny_frames, base_dir=base_dir, date_str=date)
+            investiny_long = investiny_to_long(investiny_frames)
+            if not investiny_long.empty:
+                investiny_long = add_basic_features(investiny_long)
+                long_frames.append(investiny_long)
+
+    if long_frames:
+        long = pd.concat(long_frames, ignore_index=True)
+        long = long.sort_values(["date", "ticker"]).reset_index(drop=True)
     else:
         long = pd.DataFrame(columns=["date", "ticker", "close", "pct_change"])  # Fallback vacío.
+
+    ensure_dir(Path(base_dir) / "processed")
+    long.to_parquet(Path(base_dir) / "processed" / "market_daily.parquet", index=False)
 
     market_day = daily_context(long)
 

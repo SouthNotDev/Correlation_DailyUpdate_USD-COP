@@ -19,7 +19,7 @@ El objetivo es mantener la solución simple y eficiente, con la menor cantidad d
 - Yahoo Finance (yfinance):
   - USD/COP: `COP=X`
   - Brent Crude Oil Last Day Financial: `BZ=F`
-  - US Dollar Index (DXY): `^DXY` (confirmado)
+  - US Dollar Index (DXY): `DX-Y.NYB`
   - Volatilidad: `^VIX`
 - Investing.com (vía investiny):
   - Rentabilidad del bono Colombia 5 años
@@ -28,6 +28,7 @@ El objetivo es mantener la solución simple y eficiente, con la menor cantidad d
 Notas:
 - Validaremos los símbolos exactos soportados por yfinance en el entorno antes de fijarlos.
 - Para Investing.com con investiny se requiere obtener el `instrument_id` de cada bono y respetar sus Términos de Uso.
+- Configura config/settings.yaml > investiny (interval, lookback_days e instrument_id) antes de ejecutar el pipeline.
 
 
 ## Alcance (MVP)
@@ -120,9 +121,8 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install --upgrade pip
 pip install pandas numpy yfinance pytz python-dateutil
 pip install requests beautifulsoup4 lxml feedparser pyyaml pyarrow
-# Más adelante: pip install investiny
-```
-
+## Integracion con Investiny
+El pipeline descarga los instrumentos definidos en config/settings.yaml cuando investiny.enabled es true. Los CSV crudos se guardan en data/raw/investiny/<fecha> y los precios procesados se agregan a data/processed/market_daily.parquet. Completa instrument_id y, si quieres renombrar la serie, ajusta el campo alias.
 
 ## Configuración
 
@@ -134,14 +134,20 @@ yfinance:
     - COP=X     # USD/COP
     - BZ=F      # Brent
     - ^VIX      # VIX
-    - ^DXY      # DXY
+    - DX-Y.NYB  # DXY
   period_years: 5
   interval: 1d
 investiny:
-  enabled: false
+  enabled: true
+  interval: D
+  lookback_days: 365
   instruments:
-    col_bond_5y: null   # completar con instrument_id
-    col_bond_10y: null
+    col_bond_5y:
+      id: 29240
+      alias: COL_BOND_5Y
+    col_bond_10y:
+      id: 29236
+      alias: COL_BOND_10Y
 news:
   enabled: true
   keywords: ["peso", "dólar", "dolar", "USDCOP", "TRM", "Brent", "petróleo", "petroleo", "tasa", "inflación", "inflacion", "TES"]
