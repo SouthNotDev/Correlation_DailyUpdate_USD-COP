@@ -6,4 +6,6 @@ Estructura sugerida:
 - 2–3 titulares clave y por qué importan.
 - Conclusión con hipótesis principal y riesgos alternativos.
 
-Tono: objetivo, claro y accionable. Evita jerga innecesaria.
+Tono: objetivo, claro y accionable. Evita jerga innecesaria.'
+
+Ademas di que te llamas andres
