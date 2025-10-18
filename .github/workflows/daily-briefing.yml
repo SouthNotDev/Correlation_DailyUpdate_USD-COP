@@ -1,0 +1,68 @@
+name: Daily Briefing Generation
+
+on:
+  schedule:
+    # Ejecuta diariamente a las 7:00 AM UTC (2:00 AM EST / 3:00 AM EDT)
+    - cron: '0 7 * * *'
+  workflow_dispatch:  # Permite ejecución manual
+
+jobs:
+  generate-briefing:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.11']
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run daily pipeline
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python src/scripts/daily_update.py --date today
+      
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: daily-briefing-${{ github.run_number }}
+          path: |
+            reports/briefings/
+            reports/relations/
+          retention-days: 30
+      
+      - name: Commit and push results (optional)
+        if: always()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Solo si hay cambios
+          if [[ -n $(git status -s) ]]; then
+            git add reports/
+            git commit -m "Daily briefing update - $(date +%Y-%m-%d)"
+            git push
+          fi
+        continue-on-error: true
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "⚠️  Pipeline failed for $(date +%Y-%m-%d)"
+          echo "Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

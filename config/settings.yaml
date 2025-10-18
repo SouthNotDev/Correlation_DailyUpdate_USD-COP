@@ -4,22 +4,24 @@ yfinance:
     - BZ=F      # Brent
     - ^VIX      # VIX
     - DX-Y.NYB  # DXY (ICE)
+    - EMB       # iShares JPM EM Bond ETF
+    - EMLC      # EM local currency debt ETF
+    - LEMB      # EM local currency bond ETF
+    - FEMB      # EM local currency bond ETF
+    - ICOL      # MSCI Colombia ETF
+    - GXG       # MSCI Colombia alternative ETF
+    - CIB       # Bancolombia ADR
+    - ^TNX      # US 10Y Treasury Yield
+    - KC=F      # Coffee futures
+    - MTF=F     # Newcastle coal futures
+    - GC=F      # Gold futures
+    - USDCLP=X  # USD/CLP
+    - USDMXN=X  # USD/MXN
   period_years: 5
   interval: 1d
-investiny:
-  enabled: true
-  interval: D
-  lookback_days: 365
-  instruments:
-    col_bond_5y:
-      id: 29240
-      alias: COL_BOND_5Y
-    col_bond_10y:
-      id: 29236
-      alias: COL_BOND_10Y
 news:
   enabled: true
-  keywords: ["peso", "dólar", "dolar", "USDCOP", "TRM", "Brent", "petróleo", "petroleo", "tasa", "inflación", "inflacion", "TES"]
+  keywords: ["peso", "dolar", "dolar", "USDCOP", "TRM", "Brent", "petroleo", "petroleo", "tasa", "inflacion", "inflacion", "TES"]
   sources_csv: info_sources.csv
 llm:
   enabled: false

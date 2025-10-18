@@ -1,11 +1,9 @@
-# Documentación Técnica - YFinance e Investiny
 
 ## Información General del Proyecto
 
 Este proyecto utiliza dos librerías principales para la obtención de datos financieros:
 
 - **yfinance**: Para descargar datos históricos de precios de activos desde Yahoo Finance
-- **investiny**: Para obtener datos históricos de bonos desde Investing.com
 
 ## YFinance - Documentación Técnica
 
@@ -64,8 +62,15 @@ Según la documentación de Yahoo Finance y símbolos disponibles:
 
 - **USD/COP**: `COP=X` (par de divisas USD/COP)
 - **Brent Crude Oil**: `BZ=F` (futuros de Brent)
-- **US Dollar Index (DXY)**: `DX-Y.NYB` (índice del dólar estadounidense)
-- **VIX (Volatilidad)**: `^VIX` (índice de volatilidad del mercado)
+- **US Dollar Index (DXY)**: `DX-Y.NYB` (�ndice del d�lar estadounidense)
+- **VIX (Volatilidad)**: `^VIX` (�ndice de volatilidad del mercado)
+- **Bonos EM en USD**: `EMB`
+- **Bonos EM moneda local**: `EMLC`, `LEMB`, `FEMB`
+- **Riesgo Colombia (acciones)**: `ICOL`, `GXG`, `CIB`
+- **Tasas base globales**: `^TNX`
+- **Commodities de exportaci�n**: `KC=F` (caf�), `MTF=F` (carb�n)
+- **Activos refugio**: `GC=F` (oro)
+- **FX regional**: `USDCLP=X`, `USDMXN=X`
 
 ### Características Técnicas
 
@@ -84,24 +89,20 @@ Según la documentación de Yahoo Finance y símbolos disponibles:
 - **Disponibilidad**: Algunos símbolos pueden no estar disponibles en ciertas regiones
 - **Datos históricos**: Limitaciones en profundidad histórica para algunos activos
 
-## Investiny - Documentación Técnica
 
 ### Instalación
 
 ```bash
-pip install investiny
 ```
 
 ### Descripción General
 
-`investiny` es una librería Python más rápida, ligera y fácil de usar para obtener datos históricos e intradiarios desde Investing.com. Es una alternativa moderna a `investpy`.
 
 ### Funcionalidades Principales
 
 #### 1. Búsqueda de Activos
 
 ```python
-from investiny import search_assets
 
 # Buscar activos por nombre o símbolo
 results = search_assets(
@@ -118,7 +119,6 @@ investing_id = int(results[0]["ticker"])
 #### 2. Descarga de Datos Históricos
 
 ```python
-from investiny import historical_data
 
 # Datos históricos usando el ID de Investing.com
 data = historical_data(
@@ -139,7 +139,6 @@ Para obtener los `instrument_id` de los bonos colombianos:
 
 1. **Búsqueda inicial**:
 ```python
-from investiny import search_assets
 
 # Buscar bonos Colombia 5Y
 results_5y = search_assets(
@@ -171,9 +170,12 @@ for result in results_5y:
 - **Sin índice de fecha**: Los datos vienen sin índice de tiempo (necesario post-procesamiento)
 
 #### Ventajas sobre investpy
-- ✅ Datos intradiarios disponibles
-- ✅ Más rápido y ligero
-- ✅ Más fácil de usar
+- �
+ Datos intradiarios disponibles
+- �
+ Más rápido y ligero
+- �
+ Más fácil de usar
 - ❌ Sin datos de dividendos
 - ❌ Sin calendario económico
 - ❌ Sin indicadores técnicos
@@ -232,10 +234,8 @@ def descargar_datos_yfinance():
     return None
 ```
 
-### Flujo de Datos - Investiny
 
 ```python
-from investiny import search_assets, historical_data
 import pandas as pd
 
 def obtener_bonos_colombia():
@@ -293,7 +293,6 @@ def descargar_datos_bonos(bonos_ids):
 - **Cache**: Considerar almacenamiento local para evitar requests frecuentes
 - **Validación**: Verificar disponibilidad de símbolos antes del deployment
 
-### Investiny
 - **IDs dinámicos**: Los `investing_id` pueden cambiar, requerir monitoreo
 - **Búsqueda robusta**: Implementar lógica para encontrar IDs correctos
 - **Post-procesamiento**: Convertir datos a formato estándar (con índice de fecha)
