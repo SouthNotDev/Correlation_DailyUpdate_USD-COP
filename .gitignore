@@ -52,3 +52,4 @@ reports/briefings/briefing_*.md
 reports/briefings/briefing_*.html
 reports/relations/relations_*.csv
 reports/relations/relations_*.json
+SETUP_COMPLETE.md
