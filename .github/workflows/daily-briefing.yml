@@ -30,6 +30,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NEWS_USER_AGENT: ${{ secrets.NEWS_USER_AGENT }}
+          PYTHONPATH: ${{ github.workspace }}
         run: python src/scripts/daily_update.py --date today
 
       - name: Upload briefing artifacts

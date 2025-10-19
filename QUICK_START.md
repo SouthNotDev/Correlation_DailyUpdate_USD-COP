@@ -27,6 +27,7 @@ The primary file for your website or newsletter is `reports/briefings/briefing_Y
 python -m venv .venv
 .venv\\Scripts\\activate  # use source .venv/bin/activate on macOS or Linux
 pip install -r requirements.txt
+set OPENAI_API_KEY=sk-your-key  # macOS/Linux: export OPENAI_API_KEY=sk-your-key
 python src/scripts/daily_update.py --date today
 ```
 

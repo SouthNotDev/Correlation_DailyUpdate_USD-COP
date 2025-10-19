@@ -35,6 +35,8 @@ def clean_directory(path: Path) -> None:
     if not path.exists():
         return
     for item in path.iterdir():
+        if item.name == ".gitkeep":
+            continue
         if item.is_file():
             item.unlink()
         else:
@@ -128,9 +130,11 @@ def main() -> None:
     if args.skip_llm:
         print(f"[{date}] Skipping LLM step by request.")
         briefing_path.write_text("# Briefing no generado\n", encoding="utf-8")
+        print(f"[{date}] Briefing placeholder saved to {briefing_path}.")
     elif relations_df.empty:
         print(f"[{date}] Skipping LLM step due to missing relations data.")
         briefing_path.write_text("# Briefing no disponible\n", encoding="utf-8")
+        print(f"[{date}] Briefing placeholder saved to {briefing_path}.")
     else:
         print(f"[{date}] Generating briefing with LLM...")
         try:
@@ -140,6 +144,7 @@ def main() -> None:
         except Exception as exc:  # noqa: BLE001
             print(f"[{date}] LLM generation failed: {exc}")
             briefing_path.write_text("# Briefing no disponible\n", encoding="utf-8")
+            print(f"[{date}] Briefing placeholder saved to {briefing_path}.")
 
     output_summary = {
         "date": date,
