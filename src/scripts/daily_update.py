@@ -7,7 +7,7 @@ import datetime as dt
 import json
 import shutil
 from pathlib import Path
-from typing import Tuple
+from typing import Dict, Tuple
 
 import pandas as pd
 import yaml
@@ -106,7 +106,7 @@ def format_percent(value: float) -> str:
     return f"{value:+.2%}".replace(".", ",")
 
 
-def build_price_context(long_prices: pd.DataFrame) -> Tuple[str, dict]:
+def build_price_context(long_prices: pd.DataFrame, report_date: dt.date) -> Tuple[str, Dict[str, float]]:
     """Create a textual summary of the latest USD/COP closes."""
     usd = long_prices[long_prices["ticker"] == "COP=X"].copy()
     if usd.empty:
@@ -121,14 +121,17 @@ def build_price_context(long_prices: pd.DataFrame) -> Tuple[str, dict]:
     latest = usd.iloc[-1]
     last_date = latest["date"].date()
     last_close = float(latest["close"])
+    days_since = (report_date - last_date).days
 
     price_meta = {
         "last_date": last_date.isoformat(),
         "last_close": last_close,
+        "report_date": report_date.isoformat(),
+        "days_since": days_since,
     }
 
     lines = [
-        f"- Cierre más reciente ({format_spanish_date(last_date)}): "
+        f"- Último cierre disponible ({format_spanish_date(last_date)}): "
         f"{format_currency(last_close)} COP por USD",
     ]
 
@@ -163,6 +166,21 @@ def build_price_context(long_prices: pd.DataFrame) -> Tuple[str, dict]:
         lines.append(
             "- No hay un cierre anterior disponible para comparar (primera observación registrada)."
         )
+
+    if days_since != 0:
+        if days_since == 1:
+            lines.append(
+                f"- Nota: el informe se genera el {format_spanish_date(report_date)} (1 día después del último cierre)."
+            )
+        elif days_since > 1:
+            lines.append(
+                f"- Nota: el informe se genera el {format_spanish_date(report_date)}, "
+                f"{days_since} días después del último cierre negociado."
+            )
+        elif days_since < 0:
+            lines.append(
+                f"- Nota: la fecha del informe ({format_spanish_date(report_date)}) es anterior al último cierre registrado."
+            )
 
     return "\n".join(lines), price_meta
 
@@ -204,7 +222,8 @@ def main() -> None:
     long_prices.to_parquet(processed_path, index=False)
     print(f"[{date}] Stored {len(long_prices)} price rows.")
 
-    price_context, price_meta = build_price_context(long_prices)
+    report_date = dt.date.fromisoformat(date)
+    price_context, price_meta = build_price_context(long_prices, report_date)
 
     # 2) Relations analysis
     print(f"[{date}] Building factor relations...")
@@ -246,7 +265,13 @@ def main() -> None:
     else:
         print(f"[{date}] Generating briefing with LLM...")
         try:
-            briefing_md = build_briefing_with_llm(date, price_context, relations_df, news_items)
+            briefing_md = build_briefing_with_llm(
+                date,
+                price_context,
+                price_meta,
+                relations_df,
+                news_items,
+            )
             briefing_path.write_text(briefing_md + "\n", encoding="utf-8")
             print(f"[{date}] Briefing saved to {briefing_path}.")
         except Exception as exc:  # noqa: BLE001

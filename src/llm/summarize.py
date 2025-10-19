@@ -86,6 +86,7 @@ def get_openai_client() -> OpenAI:
 def build_briefing_with_llm(
     date: str,
     price_context: str,
+    price_meta: dict,
     relations_df: pd.DataFrame,
     news_items: Sequence[dict],
     model: str = "gpt-4o-mini",
@@ -103,10 +104,35 @@ def build_briefing_with_llm(
         news_text = _format_noticias_for_prompt(list(news_items))
 
         system_prompt = _get_system_prompt()
+        days_since = price_meta.get("days_since")
+        if days_since is None:
+            date_guidance = (
+                "No se pudo calcular la diferencia entre el informe y el último cierre; "
+                "menciona las fechas tal cual sin asumir que fue 'ayer'."
+            )
+        elif days_since == 1:
+            date_guidance = (
+                "El informe se genera un día después del último cierre, puedes usar 'ayer' solo si la frase resulta natural."
+            )
+        elif days_since is not None and days_since > 1:
+            date_guidance = (
+                f"Han pasado {days_since} días entre la fecha del informe y el último cierre; "
+                "NO uses 'ayer', cita explícitamente la fecha del último cierre."
+            )
+        elif days_since is not None and days_since < 0:
+            date_guidance = (
+                "La fecha del informe es anterior al último cierre disponible; explica ese desfase claramente."
+            )
+        else:
+            date_guidance = (
+                "No asumas que el cierre fue 'ayer'; cita la fecha en palabras."
+            )
+
         user_prompt = (
             f"Fecha analizada: {date}\n\n"
             "Cierres y variación reciente (usa estos valores literalmente en la primera frase):\n"
             f"{price_context}\n\n"
+            f"Guía temporal: {date_guidance}\n\n"
             "Factores cuantitativos relevantes para el movimiento del USD-COP:\n"
             f"{factors_summary}\n\n"
             "Cómo interpretar cada factor (emplea estos nombres en la redacción, nunca los códigos técnicos):\n"
