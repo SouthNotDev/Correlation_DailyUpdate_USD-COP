@@ -22,14 +22,16 @@ An automated pipeline that turns raw market data into a daily, ready-to-publish 
 3. The LLM briefing step turns structured metrics into a human-readable summary.
 4. Publishing saves the results in `reports/briefings/` so they can be embedded or consumed via the GitHub raw URL.
 
-## Sample Output
+## Sample Output - In spanish
 ```
-USD/COP closed 0.6% higher on lighter-than-normal volumes. The move tracked broad
-U.S. dollar strength as the DXY index gained 0.4%, while regional currencies
-like MXN and CLP also weakened. Softer Brent crude prices removed a traditional
-support for COP, and local rates in Colombia inched up, suggesting some domestic
-pressure. Today's news cycle focused on Colombia's fiscal outlook and the Fed's
-messaging, reinforcing the cautious tone.
+# Briefing USD-COP - 19 de octubre de 2025
+
+Ayer, viernes 17 de octubre de 2025, el cierre del tipo de cambio USD-COP fue de 3.860,75 COP por USD, lo que representa una disminución de 28,95 COP (-0,74%) en comparación con el cierre anterior de 3.889,70 COP por USD. Este movimiento a la baja se vio influenciado por varios factores en el mercado cambiario.
+
+En términos cuantitativos, los activos financieros colombianos tuvieron una contribución negativa al tipo de cambio, lo que indica un mayor apetito por riesgo en el contexto local, mientras que los factores locales no modelados también aportaron a la presión a la baja. En contraste, las monedas latinoamericanas frente al dólar mostraron un ligero debilitamiento, lo que restó soporte al peso colombiano. El petróleo Brent y el índice dólar global no tuvieron un impacto significativo en el movimiento del día, lo que sugiere que el mercado estuvo más influenciado por factores internos y la dinámica de riesgo local.
+
+En el contexto noticioso, se reportaron rumores sobre un decreto que podría cambiar la inversión de las administradoras de fondos de pensiones, lo que generó incertidumbre en el mercado y contribuyó a la caída del dólar. Además, la situación política en Ecuador, con el fin de las protestas tras un acuerdo entre el presidente y los indígenas, podría tener un efecto indirecto en la región, aunque no se observaron impactos inmediatos en el tipo de cambio. En conclusión, el driver principal del movimiento fue el aumento del apetito por riesgo en el mercado colombiano, mientras que el riesgo secundario a seguir es la evolución de las noticias relacionadas con las políticas económicas locales.
+
 ```
 
 ## Tech Highlights
