@@ -1,79 +1,51 @@
-# ⚡ Quick Start: 3 Pasos para Empezar
+# Quick Start
 
-## Paso 1️⃣: Crear OpenAI API Key (2 min)
+Follow these steps to generate the USD-COP daily briefing in minutes.
 
-1. Ve a: **https://platform.openai.com/api-keys**
-2. Click en **+ Create new secret key**
-3. Dale nombre: "USD-COP Daily Briefing"
-4. **COPIA la clave** (aparece solo una vez) ✅
+## 1. Create Your OpenAI API Key
+1. Visit https://platform.openai.com/api-keys
+2. Select **Create new secret key**
+3. Name it something memorable (for example `usd-cop-briefing`)
+4. Copy the key because it is shown only once
 
----
+## 2. Store The Key In GitHub
+1. Open your repository on GitHub.com
+2. Navigate to **Settings > Secrets and variables > Actions**
+3. Choose **New repository secret**
+4. Set **Name** to `OPENAI_API_KEY` and paste the value you copied
+5. Save the secret
 
-## Paso 2️⃣: Agregar Secret en GitHub (2 min)
+## 3. Run The Pipeline
+- **Automatic**: The workflow runs every day at 07:00 UTC. Fresh briefings appear in `reports/briefings/`
+- **Manual**: Go to the **Actions** tab, select **Daily Briefing**, click **Run workflow**, and wait roughly three minutes
 
-1. Ve a tu repositorio en **GitHub.com**
-2. **Settings → Secrets and variables → Actions**
-3. Click en **New repository secret**
-4. Rellena:
-   - **Name**: `OPENAI_API_KEY`
-   - **Secret**: Pega la clave que copiaste
-5. Click en **Add secret** ✅
-
----
-
-## Paso 3️⃣: Ejecutar el Pipeline (1 min)
-
-### Opción A: Automático (recomendado)
-- El sistema se ejecuta **automáticamente cada día a las 7:00 AM UTC**
-- Los briefings aparecerán en `reports/briefings/briefing_llm_*.txt`
-
-### Opción B: Manual (para probar ahora)
-1. Ve a tu repo en GitHub
-2. Pestaña **Actions**
-3. Click en **Daily Briefing Generation**
-4. Botón azul **Run workflow**
-5. Espera 2-3 minutos ⏳
-
----
-
-## ✅ ¡Listo!
-
-Tu sistema está generando briefings automáticamente cada día.
-
-**El archivo principal es:**
+The primary file for your website or newsletter is:
 ```
 reports/briefings/briefing_llm_YYYY-MM-DD.txt
 ```
 
----
-
-## 📖 Documentación
-
-- **`README.md`** - Documentación completa
-- **`DEPLOY.md`** - Guía detallada de despliegue
-- **`SETUP_COMPLETE.md`** - Lo que se implementó
-
----
-
-## 🌐 Integrar en tu Website
-
-```javascript
-// Obtener el briefing del día
-const today = new Date().toISOString().split('T')[0];
-const url = `https://raw.githubusercontent.com/TU-USUARIO/TU-REPO/main/reports/briefings/briefing_llm_${today}.txt`;
-
-fetch(url)
-  .then(response => response.text())
-  .then(briefing => {
-    document.querySelector('#briefing-container').textContent = briefing;
-  })
-  .catch(() => {
-    console.log('Briefing no disponible para hoy');
-  });
+## Optional: Local Execution
+```bash
+python -m venv .venv
+.venv\\Scripts\\activate  # use source .venv/bin/activate on macOS or Linux
+pip install -r requirements.txt
+python src/scripts/daily_update.py --date today
 ```
 
----
+## Optional: Website Embed (JSON)
+```javascript
+const today = new Date().toISOString().split("T")[0];
+const url = `https://raw.githubusercontent.com/<your-user>/<your-repo>/main/reports/briefings/briefing_${today}.json`;
 
-## 🚀 ¡Listo para producción!
+fetch(url)
+  .then(response => response.json())
+  .then(data => {
+    document.querySelector("#briefing").textContent = data.briefing;
+  })
+  .catch(() => console.log("Briefing not available yet."));
+```
 
-Tu sistema de análisis USD/COP está 100% operativo y generando briefings profesionales cada día automáticamente.
+## Troubleshooting
+- **Missing key**: Confirm `OPENAI_API_KEY` exists in GitHub secrets or your local `.env`
+- **Empty news section**: Add a `NEWS_USER_AGENT` secret so news sources accept the scraper
+- **No new files**: Check the Action logs for errors and confirm the schedule is set to your desired time
