@@ -18,11 +18,9 @@ Follow these steps to generate the USD-COP daily briefing in minutes.
 ## 3. Run The Pipeline
 - **Automatic**: The workflow runs every day at 07:00 UTC. Fresh briefings appear in `reports/briefings/`
 - **Manual**: Go to the **Actions** tab, select **Daily Briefing**, click **Run workflow**, and wait roughly three minutes
+- The run automatically removes previous daily data and keeps only the freshly generated files
 
-The primary file for your website or newsletter is:
-```
-reports/briefings/briefing_llm_YYYY-MM-DD.txt
-```
+The primary file for your website or newsletter is `reports/briefings/briefing_YYYY-MM-DD.md`.
 
 ## Optional: Local Execution
 ```bash
@@ -32,15 +30,15 @@ pip install -r requirements.txt
 python src/scripts/daily_update.py --date today
 ```
 
-## Optional: Website Embed (JSON)
+## Optional: Website Embed
 ```javascript
 const today = new Date().toISOString().split("T")[0];
-const url = `https://raw.githubusercontent.com/<your-user>/<your-repo>/main/reports/briefings/briefing_${today}.json`;
+const url = `https://raw.githubusercontent.com/<your-user>/<your-repo>/main/reports/briefings/briefing_${today}.md`;
 
 fetch(url)
-  .then(response => response.json())
-  .then(data => {
-    document.querySelector("#briefing").textContent = data.briefing;
+  .then(response => response.text())
+  .then(markdown => {
+    document.querySelector("#briefing").textContent = markdown;
   })
   .catch(() => console.log("Briefing not available yet."));
 ```

@@ -7,7 +7,7 @@ An automated pipeline that turns raw market data into a daily, ready-to-publish 
 - Packages the story in a short briefing that is ready for a website or newsletter.
 - Runs hands-free every morning through GitHub Actions with no servers to manage.
 - Enriches the narrative with supporting data: market drivers, correlations, and curated news headlines.
-- Ships multiple formats (plain text, Markdown, HTML, JSON, CSV) so different audiences can consume the output.
+- Ships a single Markdown briefing each day, making it easy to embed or share without extra processing.
 
 ## What The Daily Briefing Delivers
 - A 3-4 paragraph narrative that explains the daily currency move in plain language.
@@ -36,7 +36,7 @@ messaging, reinforcing the cautious tone.
 - Python scripts orchestrate data ingestion, analysis, and prompt assembly.
 - OpenAI GPT models transform structured metrics into clean narrative copy.
 - GitHub Actions handles automated scheduling and delivery.
-- Ready-made JSON and HTML assets let a website display the daily story with a single fetch call.
+- Produces clean Markdown that can be fetched directly from GitHub for web or newsletter publishing.
 
 ## Want To Run It Yourself?
 Open `QUICK_START.md` for a concise setup checklist. It covers how to add your OpenAI key, run the pipeline locally or on schedule, and embed the daily briefing on a website or newsletter.
