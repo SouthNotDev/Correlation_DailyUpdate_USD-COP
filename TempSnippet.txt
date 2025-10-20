@@ -1,0 +1,141 @@
+        for i in range(len(df)):
+            if i >= 90 and not betas.iloc[i].isna().any():
+                # Contribuciones de factores
+                cop_actual = df['COP=X'].iloc[i]
+                cop_abs = abs(cop_actual)
+
+                for col in x_cols:
+                    factor_actual = df[col].iloc[i]
+                    beta_factor = betas[col].iloc[i]
+                    contrib_raw = float(beta_factor * factor_actual)
+
+                    # Aplicar capping: |contribucion_factor| <= 0.8 * |retorno_COP_hoy|
+                    contrib_cap = max(-0.8 * cop_abs, min(0.8 * cop_abs, contrib_raw))
+                    contribs.loc[df.index[i], col] = contrib_cap
+
+                # Residual (usando contribuciones cappeadas)
+                contrib_total = contribs.loc[df.index[i], x_cols].sum()
+                residual_value = float(cop_actual - contrib_total)
+                contribs.loc[df.index[i], 'residual'] = residual_value
+
+        # Llenar valores faltantes con 0
+        contribs = contribs.fillna(0).infer_objects(copy=False)
+        contribuciones[periodo] = contribs
+
+    return contribuciones
+
+
+def crear_tabla_resultado(contribuciones: Dict[str, pd.DataFrame], factores: Dict[str, pd.DataFrame], modelos: Dict[str, Dict]) -> Dict[str, pd.DataFrame]:
+    """Crea tablas mínimas separadas para 1d y 5d con columna note."""
+
+    tablas = {}
+
+    for periodo in ['1d', '5d']:
+        # Usar datos del día más reciente
+        ultimo_dia = factores[periodo].index.max()
+
+        # Obtener datos del día más reciente
+        factores_periodo = factores[periodo]
+        contribuciones_periodo = contribuciones[periodo]
+        betas_periodo = modelos[periodo]['betas']
+
+        if ultimo_dia not in factores_periodo.index:
+            tablas[periodo] = pd.DataFrame()  # Sin datos para el día más reciente
+            continue
+
+        # Variables para calcular
+        if periodo == '1d':
+            x_cols = ['DXY_L1', 'LA_USD', 'BZ_lag1']  # Sin Local5d para 1d
+        else:
+            x_cols = ['DXY_L1', 'LA_USD', 'BZ_lag1', 'Local5d']  # Con Local5d para 5d
+
+        # Crear tabla resultado
+        resultado = []
+
+        for col in x_cols:
+            beta_actual = float(betas_periodo[col].loc[ultimo_dia]) if ultimo_dia in betas_periodo.index and not pd.isna(betas_periodo[col].loc[ultimo_dia]) else 0.0
+
+            # Verificar si fue cappeado
+            cop_actual = factores_periodo['COP=X'].loc[ultimo_dia]
+            contrib_actual = contribuciones_periodo[col].loc[ultimo_dia]
+            contrib_raw = beta_actual * factores_periodo[col].loc[ultimo_dia]
+
+            note = ""
+            if abs(contrib_actual) < abs(contrib_raw) and abs(contrib_raw) > 0.001:
+                note = "capped"
+
+            fila = {
+                'factor': col,
+                'retorno_hoy': float(factores_periodo[col].loc[ultimo_dia]) if ultimo_dia in factores_periodo.index and not pd.isna(factores_periodo[col].loc[ultimo_dia]) else 0.0,
+                'beta_rolling': beta_actual,
+                'contribucion': float(contribuciones_periodo[col].loc[ultimo_dia]) if ultimo_dia in contribuciones_periodo.index and not pd.isna(contribuciones_periodo[col].loc[ultimo_dia]) else 0.0,
+                'corr_5d_rolling': 0.0,  # Se calculará después
+                'score_factor': 0.0,  # Se calculará después
+                'note': note
+            }
+            resultado.append(fila)
+
+        # Agregar residual
+        resultado.append({
+            'factor': 'residual',
+            'retorno_hoy': 0.0,
+            'beta_rolling': 0.0,
+            'contribucion': float(contribuciones_periodo['residual'].loc[ultimo_dia]) if ultimo_dia in contribuciones_periodo.index and not pd.isna(contribuciones_periodo['residual'].loc[ultimo_dia]) else 0.0,
+            'corr_5d_rolling': 0.0,
+            'score_factor': 0.0,
+            'note': ""
+        })
+
+        resultado_df = pd.DataFrame(resultado)
+
+        # Calcular métricas adicionales (corr_5d_rolling, score_factor)
+        resultado_df = calcular_metricas_adicionales(resultado_df, factores_periodo, ultimo_dia)
+
+        tablas[periodo] = resultado_df
+
+    return tablas
+
+
+def calcular_metricas_adicionales(df: pd.DataFrame, factores_5d: pd.DataFrame, ultimo_dia: pd.Timestamp) -> pd.DataFrame:
+    """Calcula métricas adicionales como correlaciones y scores."""
+
+    # Calcular correlaciones rolling 5d
+    ventana_datos = factores_5d.loc[:ultimo_dia]
+
+    for i, row in df.iterrows():
+        if row['factor'] != 'residual':
+            factor_col = row['factor']
+
+            # Correlación 5d rolling
+            corr_rolling = ventana_datos[factor_col].rolling(5).corr(ventana_datos['COP=X'])
+            corr_value = float(corr_rolling.loc[ultimo_dia]) if ultimo_dia in corr_rolling.index and not pd.isna(corr_rolling.loc[ultimo_dia]) else 0.0
+            df.loc[i, 'corr_5d_rolling'] = corr_value
+
+    # Calcular scores
+    df = calcular_scores(df)
+
+    return df
+
+
+def calcular_scores(df: pd.DataFrame) -> pd.DataFrame:
+    """Calcula scores para desempate según la regla especificada."""
+
+    # Calcular estabilidad = 1 / (sd_rolling_beta + 1e-6) reescalado 0 a 1
+    estabilidades = []
+    for i, row in df.iterrows():
+        if row['factor'] != 'residual':
+            # Simular cálculo de estabilidad (en implementación real usar betas históricos)
+            estabilidad = 0.5  # Placeholder
+            estabilidades.append(estabilidad)
+
+    if estabilidades:
+        estabilidad_min = min(estabilidades)
+        estabilidad_max = max(estabilidades)
+
+        for i, row in df.iterrows():
+            if row['factor'] != 'residual':
+                estabilidad = estabilidades[i] if i < len(estabilidades) else 0.5
+
+                # Reescalar a 0-1
+                estabilidad_norm = (estabilidad - estabilidad_min) / (estabilidad_max - estabilidad_min) if estabilidad_max > estabilidad_min else 0.5
+

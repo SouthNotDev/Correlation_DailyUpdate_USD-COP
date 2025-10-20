@@ -64,6 +64,7 @@ def main() -> None:
 
     report_date = resolve_date(args.date)
     date_str = report_date.strftime("%Y-%m-%d")
+    publish_at = (dt.datetime.utcnow() + dt.timedelta(minutes=1)).replace(microsecond=0).isoformat() + "Z"
 
     briefing_path = Path(args.briefing_dir) / f"briefing_{date_str}.md"
     if not briefing_path.exists():
@@ -123,9 +124,10 @@ def main() -> None:
         if args.draft_only:
             return
 
-        queued = client.queue_email(email_id)
+        scheduled = client.schedule_email(email_id, publish_at=publish_at)
         print(
-            f"Newsletter queued for delivery (status={queued.get('status', 'unknown')})."
+            f"Newsletter scheduled for {scheduled.get('publish_at', publish_at)} "
+            f"(status={scheduled.get('status', 'unknown')})."
         )
     except ButtondownError as exc:
         raise SystemExit(f"Buttondown API error: {exc}") from exc
