@@ -83,14 +83,13 @@ class ButtondownClient:
         return self._request("POST", "/v1/emails", json=payload)
 
     def queue_email(self, email_id: str | int) -> Dict[str, Any]:
-        """Queue a draft email for sending to all subscribers."""
+        """Queue a draft email for delivery."""
         return self._request(
-            "PATCH",
-            f"/v1/emails/{email_id}",
-            json={"status": "queued"},
+            "POST",
+            f"/v1/emails/{email_id}/queue",
+            json={},
         )
 
     def delete_email(self, email_id: str | int) -> None:
         """Delete a draft if needed."""
         self._request("DELETE", f"/v1/emails/{email_id}")
-
