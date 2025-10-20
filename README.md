@@ -21,6 +21,7 @@ An automated pipeline that turns raw market data into a daily, ready-to-publish 
 2. Market data ingestion pulls five years of history for USD-COP and key drivers, plus the latest day.
 3. The LLM briefing step turns structured metrics into a human-readable summary.
 4. Publishing saves the results in `reports/briefings/` so they can be embedded or consumed via the GitHub raw URL.
+5. A Buttondown step queues the newsletter so subscribers receive it right after the workflow finishes.
 
 ## Sample Output - In spanish
 ```
@@ -42,6 +43,11 @@ En el contexto noticioso, se reportaron rumores sobre un decreto que podría cam
 
 ## Want To Run It Yourself?
 Open `QUICK_START.md` for a concise setup checklist. It covers how to add your OpenAI key, run the pipeline locally or on schedule, and embed the daily briefing on a website or newsletter.
+
+## Newsletter Delivery
+- Subscribe to the daily email at [buttondown.com/juandavidsanchezlatorre](https://buttondown.com/juandavidsanchezlatorre).
+- Emails ship with the subject `USD/COP - Briefing 2 minutos | YYYY-MM-DD` as soon as the 07:00 UTC job completes.
+- The Buttondown integration lives in `src/scripts/send_newsletter.py` and expects `BUTTONDOWN_API_KEY` (and optionally `BUTTONDOWN_NEWSLETTER`) to be present as GitHub Action secrets.
 
 ## Maintainer
 Juan Diego Mesa - Data and AI Engineer

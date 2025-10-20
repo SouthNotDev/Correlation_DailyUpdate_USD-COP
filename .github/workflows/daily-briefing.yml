@@ -33,6 +33,14 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: python src/scripts/daily_update.py --date today
 
+      - name: Send newsletter via Buttondown
+        if: ${{ success() }}
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+          BUTTONDOWN_NEWSLETTER: ${{ secrets.BUTTONDOWN_NEWSLETTER }}
+          BUTTONDOWN_API_BASE: ${{ secrets.BUTTONDOWN_API_BASE }}
+        run: python src/scripts/send_newsletter.py --date today
+
       - name: Upload briefing artifacts
         if: always()
         uses: actions/upload-artifact@v4

@@ -22,6 +22,13 @@ Follow these steps to generate the USD-COP daily briefing in minutes.
 
 The primary file for your website or newsletter is `reports/briefings/briefing_YYYY-MM-DD.md`.
 
+## 4. Connect Buttondown (Optional)
+1. Log into [Buttondown](https://buttondown.com/) and open **Settings → API**.
+2. Create a personal API token and copy it.
+3. Back in GitHub, add a new repository secret named `BUTTONDOWN_API_KEY` with that token.
+4. (Optional) Add `BUTTONDOWN_NEWSLETTER` if you use a non-default newsletter slug. This project defaults to `juandavidsanchezlatorre`.
+5. Share the public subscribe link: `https://buttondown.com/juandavidsanchezlatorre`. New subscribers will receive the daily email automatically once the secrets are in place.
+
 ## Optional: Local Execution
 ```bash
 python -m venv .venv
@@ -47,4 +54,5 @@ fetch(url)
 ## Troubleshooting
 - **Missing key**: Confirm `OPENAI_API_KEY` exists in GitHub secrets or your local `.env`
 - **Empty news section**: Add a `NEWS_USER_AGENT` secret so news sources accept the scraper
+- **Newsletter skipped**: Ensure `BUTTONDOWN_API_KEY` is defined and the GitHub Action log shows the Buttondown step running
 - **No new files**: Check the Action logs for errors and confirm the schedule is set to your desired time
