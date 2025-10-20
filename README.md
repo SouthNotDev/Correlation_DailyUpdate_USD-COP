@@ -50,5 +50,14 @@ Open `QUICK_START.md` for a concise setup checklist. It covers how to add your O
 - The Buttondown integration lives in `src/scripts/send_newsletter.py` and expects `BUTTONDOWN_API_KEY` (and optionally `BUTTONDOWN_NEWSLETTER`) to be present as GitHub Action secrets.
 
 ## Maintainer
-Juan Diego Mesa - Data and AI Engineer
-Always looking to build automated research experiences that feel editorial, not robotic.
+Juan David Sanchez Latorre - Business/ Finance Student
+
+## Disclaimer
+This project is for educational purposes only. The information provided is not intended to be financial advice. Always consult a professional financial advisor before making any financial decisions.
+The data is sourced from Yahoo Finance and the news is sourced from RSS feeds.
+The data is not guaranteed to be accurate and is provided "as is" without any warranty.
+The data is not intended to be used for any commercial purposes.
+The data is not intended to be used for any illegal purposes.
+The data is not intended to be used for any purposes that are not permitted by law.
+The data is not intended to be used for any purposes that are not permitted by the terms of use of the data providers.
+The data is not intended to be used for any purposes that are not permitted by the terms of use of the data providers.
