@@ -73,7 +73,11 @@ def main() -> None:
     preheader = discover_preheader(markdown_body)
 
     subject = args.subject or f"{DEFAULT_SUBJECT} | {date_str}"
-    slug = f"usd-cop-briefing-{date_str}"
+    run_suffix = os.getenv("GITHUB_RUN_ID") or os.getenv("GITHUB_RUN_NUMBER")
+    if run_suffix:
+        slug = f"usd-cop-briefing-{date_str}-{run_suffix}"
+    else:
+        slug = f"usd-cop-briefing-{date_str}-{dt.datetime.utcnow():%H%M%S}"
 
     newsletter_slug = (
         args.newsletter
@@ -129,4 +133,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
