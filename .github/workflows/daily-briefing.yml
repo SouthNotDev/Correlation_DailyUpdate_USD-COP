@@ -39,6 +39,7 @@ jobs:
           BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
           BUTTONDOWN_NEWSLETTER: ${{ secrets.BUTTONDOWN_NEWSLETTER }}
           BUTTONDOWN_API_BASE: ${{ secrets.BUTTONDOWN_API_BASE }}
+          PYTHONPATH: ${{ github.workspace }}
         run: python src/scripts/send_newsletter.py --date today
 
       - name: Upload briefing artifacts
