@@ -55,7 +55,7 @@ class ButtondownClient:
         preheader: str | None = None,
         newsletter: str | None = None,
         slug: str | None = None,
-        publish_at: str | None = None,
+        publish_date: str | None = None,
         tags: list[str] | None = None,
         extra_payload: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
@@ -73,8 +73,8 @@ class ButtondownClient:
             payload["newsletter"] = newsletter
         if slug:
             payload["slug"] = slug
-        if publish_at:
-            payload["publish_at"] = publish_at
+        if publish_date:
+            payload["publish_date"] = publish_date
         if tags:
             payload["tags"] = tags
         if extra_payload:
@@ -85,7 +85,7 @@ class ButtondownClient:
     def schedule_email(
         self,
         email_id: str | int,
-        publish_at: str,
+        publish_date: str,
     ) -> Dict[str, Any]:
         """Schedule a draft email for delivery."""
         return self._request(
@@ -93,7 +93,7 @@ class ButtondownClient:
             f"/v1/emails/{email_id}",
             json={
                 "status": "scheduled",
-                "publish_at": publish_at,
+                "publish_date": publish_date,
             },
         )
 
