@@ -1,8 +1,8 @@
-name: Daily Briefing
+﻿name: Daily Briefing
 
 on:
   schedule:
-    - cron: "0 7 * * *"
+    - cron: "0 12 * * *"
   workflow_dispatch:
 
 jobs:
